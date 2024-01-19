@@ -1,6 +1,6 @@
-import React from 'react'
-import Document, { Html, Head, Main, NextScript } from 'next/document'
-import { css, Global } from '@emotion/react'
+import React from 'react';
+import Document, { Html, Head, Main, NextScript } from 'next/document';
+import { css, Global } from '@emotion/react';
 
 class MyDocument extends Document {
   render() {
@@ -15,14 +15,19 @@ class MyDocument extends Document {
             body {
               margin: 0;
               padding: 0;
-              min-height: 100%;
+              height: 100%;
+              min-width: 100%;
             }
 
             body {
-              padding: 2rem 4rem;
-              background: papayawhip;
+              background: #191919;
               font-family: Helvetica, Arial, sans-serif;
-              font-size: 24px;
+              font-size: 16px;
+            }
+            #__next {
+              height: 100%;
+              display: flex;
+              flex-direction: column;
             }
           `}
         />
@@ -31,8 +36,8 @@ class MyDocument extends Document {
           <NextScript />
         </body>
       </Html>
-    )
+    );
   }
 }
 
-export default MyDocument
+export default MyDocument;
