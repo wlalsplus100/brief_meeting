@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import Image from 'next/image';
+import React = require('react');
 
 interface TheaderProps {
   opportunity: number;
@@ -8,33 +8,53 @@ interface TheaderProps {
 const MenuContainer = styled.div`
   background-color: black;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 5px;
   color: white;
 `;
 
-const OpportunityLeft = styled.div``;
+const OpportunityLeft = styled.div<TheaderProps>`
+  position: absolute;
+  padding: 1rem;
+  left: 0%;
+  font-size: x-large;
+  color: ${({ opportunity }) => {
+    if (opportunity === 1) {
+      return 'red';
+    } else if (opportunity <= 5) {
+      return 'yellow';
+    } else {
+      return 'inherit';
+    }
+  }};
+`;
 
 const Logo = styled.div`
-  display: flex;
-  justify-content: center;
   & > img {
     height: 100%;
   }
 `;
 
-const SeeMore = styled.div``;
+const SeeMore = styled.div`
+  position: absolute;
+  padding: 1rem;
+  right: 0%;
+`;
 
 export const Header = ({ opportunity }: TheaderProps) => {
   return (
     <>
       <MenuContainer>
-        <OpportunityLeft>남은 기회 : {opportunity}</OpportunityLeft>
+        <OpportunityLeft opportunity={opportunity}>
+          {opportunity}
+        </OpportunityLeft>
         <Logo>
-          <img src="/images/logo.svg" />
+          <img src="/images/logo.svg" alt="Logo" />
         </Logo>
-        <SeeMore>더보기</SeeMore>
+        <SeeMore>
+          <img src="/images/More_Vertical.svg" alt="See More"></img>
+        </SeeMore>
       </MenuContainer>
     </>
   );

@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
+import React = require('react');
 
 interface Tcontent {
   message: string;
@@ -19,13 +20,19 @@ const ChatBox = styled.div<{ isMyMessage?: boolean }>`
   font-size: 16px;
   display: flex;
   flex-direction: column;
+  gap: 4px;
   margin: 16px;
   align-items: ${({ isMyMessage }) =>
     isMyMessage ? 'flex-end' : 'flex-start'};
+
+  & > span {
+    padding-left: 8px;
+  }
 `;
 
 const MyChatContainer = styled.div`
   ${containerStyle}
+  background-color: pink;
 `;
 
 const HisChatContainer = styled.div`
@@ -36,7 +43,7 @@ export const Chat = ({ message, sender }: Tcontent) => {
   if (typeof sender === 'string') {
     return (
       <ChatBox>
-        {sender}
+        <span>{sender}</span>
         <HisChatContainer>
           <span>{message}</span>
         </HisChatContainer>

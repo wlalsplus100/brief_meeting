@@ -20,7 +20,7 @@ class MyDocument extends Document {
             }
 
             body {
-              background: #191919;
+              background: black;
               font-family: Helvetica, Arial, sans-serif;
               font-size: 16px;
             }
