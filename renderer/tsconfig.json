@@ -3,16 +3,14 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "./node_modules/cypress",
+    "**/*",
   ],
-  "exclude": [
-    "node_modules"
-  ],
+  "exclude": ["node_modules", "./cypress.config.ts"],
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ]
-  }
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "types": ["next", "node", "react", "react-dom", "jest"],
+    "jsx": "react",
+  },
 }
