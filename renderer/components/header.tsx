@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import React = require('react');
+import React from 'react';
 
 interface TheaderProps {
   opportunity: number;

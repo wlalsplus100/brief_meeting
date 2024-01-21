@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import React = require('react');
+import React from 'react';
 
 interface Tcontent {
   message: string;
