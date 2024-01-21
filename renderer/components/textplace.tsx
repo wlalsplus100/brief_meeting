@@ -1,5 +1,8 @@
 import styled from '@emotion/styled';
-import React from 'react';
+import React, { useRef, useState } from 'react';
+import { keyboardInputDetector } from '../utils/keyboardInputDetector';
+import { SendButton } from './sendButton';
+import { text } from 'stream/consumers';
 
 const Textarea = styled.textarea`
   box-sizing: border-box;
@@ -11,6 +14,31 @@ const Textarea = styled.textarea`
   outline: none;
 `;
 
+const Container = styled.div`
+  position: relative;
+`;
+
 export const Textplace = () => {
-  return <Textarea />;
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [onButton, setOnButton] = useState(false);
+
+  const handleKeyboardEvent: React.KeyboardEventHandler<HTMLDivElement> = event => {
+    if (textareaRef.current?.value !== '') {
+      setOnButton(true);
+      if (keyboardInputDetector(event.nativeEvent) === 'Enter' && textareaRef.current) {
+        // 메세지를 보내는 함수 호출
+        setOnButton(false);
+        textareaRef.current.value = '';
+      }
+    } else {
+      setOnButton(false);
+    }
+  };
+
+  return (
+    <Container onKeyUp={handleKeyboardEvent}>
+      <Textarea ref={textareaRef}></Textarea>
+      <SendButton onButton={onButton} setOnButton={setOnButton} />
+    </Container>
+  );
 };
