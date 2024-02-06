@@ -1,4 +1,4 @@
-import { keyboardInputDetector } from '../../utils/keyboardInputDetector';
+import { keyboardInputDetector } from '../../utils/function/keyboardInputDetector';
 
 describe('키보드인풋함수', () => {
   test('Enter가 눌렸다', () => {
