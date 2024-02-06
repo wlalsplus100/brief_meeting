@@ -1,8 +1,10 @@
 import path from 'path';
-import { app, ipcMain } from 'electron';
+import { BrowserWindow, app, ipcMain } from 'electron';
 import serve from 'electron-serve';
 import { createWindow } from './helpers';
 
+
+const windows: BrowserWindow[] = [];
 const isProd = process.env.NODE_ENV === 'production';
 
 if (isProd) {
@@ -11,10 +13,8 @@ if (isProd) {
   app.setPath('userData', `${app.getPath('userData')} (development)`);
 }
 
-(async () => {
-  await app.whenReady();
-
-  const mainWindow = createWindow('main', {
+async function createNewWindow() {
+  const newWindow = createWindow('main', {
     width: 1000,
     height: 600,
     webPreferences: {
@@ -22,17 +22,30 @@ if (isProd) {
     },
   });
 
+  windows.push(newWindow);
   if (isProd) {
-    await mainWindow.loadURL('app://./home');
+    await newWindow.loadURL('app://./home');
   } else {
     const port = process.argv[2];
-    await mainWindow.loadURL(`http://localhost:${port}/home`);
-    mainWindow.webContents.openDevTools();
+    await newWindow.loadURL(`http://localhost:${port}/home`);
+    newWindow.webContents.openDevTools();
   }
-})();
+
+  return newWindow;
+}
+
+app.whenReady().then(createNewWindow);
 
 app.on('window-all-closed', () => {
-  app.quit();
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+app.on('before-quit', () => {
+  windows.forEach(window => {
+    window.close();
+  });
 });
 
 ipcMain.on('message', async (event, arg) => {
