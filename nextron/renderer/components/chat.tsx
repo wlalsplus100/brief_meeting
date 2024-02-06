@@ -4,7 +4,7 @@ import React from 'react';
 
 interface Tcontent {
   message: string;
-  sender: string | boolean;
+  sender: string | true;
 }
 
 const containerStyle = css`
@@ -22,8 +22,7 @@ const ChatBox = styled.div<{ isMyMessage?: boolean }>`
   flex-direction: column;
   gap: 4px;
   margin: 16px;
-  align-items: ${({ isMyMessage }) =>
-    isMyMessage ? 'flex-end' : 'flex-start'};
+  align-items: ${({ isMyMessage }) => (isMyMessage ? 'flex-end' : 'flex-start')};
 
   & > span {
     padding-left: 8px;
