@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 import React, { useRef, useState } from 'react';
-import { keyboardInputDetector } from '../utils/keyboardInputDetector';
+import { keyboardInputDetector } from '../utils/function/keyboardInputDetector';
 import { SendButton } from './sendButton';
-import { text } from 'stream/consumers';
+import { sendMessage } from '../utils/function/sendMessage';
 
 const Textarea = styled.textarea`
   box-sizing: border-box;
@@ -27,6 +27,7 @@ export const Textplace = () => {
       setOnButton(true);
       if (keyboardInputDetector(event.nativeEvent) === 'Enter' && textareaRef.current) {
         // 메세지를 보내는 함수 호출
+        sendMessage(textareaRef.current.value);
         setOnButton(false);
         textareaRef.current.value = '';
       }
