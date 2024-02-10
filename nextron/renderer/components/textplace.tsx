@@ -3,6 +3,7 @@ import React, { useRef, useState } from 'react';
 import { keyboardInputDetector } from '../utils/function/keyboardInputDetector';
 import { SendButton } from './sendButton';
 import { sendMessage } from '../utils/function/sendMessage';
+import { messageMapper } from '../utils/function/messagesMapper';
 
 const Textarea = styled.textarea`
   box-sizing: border-box;
@@ -18,7 +19,13 @@ const Container = styled.div`
   position: relative;
 `;
 
-export const Textplace = () => {
+interface TextplaceT {
+  setChats: React.Dispatch<React.SetStateAction<React.ReactNode[]>>;
+  opportunity: number;
+  setOpportunity: React.Dispatch<React.SetStateAction<number>>;
+}
+
+export const Textplace = ({ setChats, opportunity, setOpportunity }: TextplaceT) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [onButton, setOnButton] = useState(false);
 
@@ -27,6 +34,13 @@ export const Textplace = () => {
       setOnButton(true);
       if (keyboardInputDetector(event.nativeEvent) === 'Enter' && textareaRef.current) {
         // 메세지를 보내는 함수 호출
+
+        const { mappedContent, remainingOpportunity } = messageMapper(
+          [{ message: textareaRef.current.value, sender: true }],
+          opportunity,
+        );
+        setChats(prevChats => [...prevChats, mappedContent]);
+        setOpportunity(remainingOpportunity);
         sendMessage(textareaRef.current.value);
         setOnButton(false);
         textareaRef.current.value = '';
