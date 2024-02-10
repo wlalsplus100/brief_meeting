@@ -1,4 +1,3 @@
-import { socket } from '../function/socketConnect';
 import { Message } from '../types/types';
 
 export const getMessages = () => {

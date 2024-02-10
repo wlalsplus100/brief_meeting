@@ -5,12 +5,27 @@ import { Textplace } from '../components/textplace';
 import { Main } from '../components/chatBox';
 import { messageMapper } from '../utils/function/messagesMapper';
 import { getMessages } from '../utils/Mock/getMessage';
-import { socket } from '../utils/function/socketConnect';
+import { connectSocket } from '../utils/function/socketConnect';
 import { MessageData } from '../utils/types/types';
+import { Socket } from 'socket.io-client';
 
 export default function HomePage() {
   const [opportunity, setOpportunity] = useState<number>(30);
   const [chats, setChats] = useState<React.ReactNode[]>([]);
+  const [socket, setSocket] = useState<Socket | null>(null);
+
+  useEffect(() => {
+    const newSocket = connectSocket();
+    setSocket(newSocket);
+    newSocket.emit('joinRoom', 'room1');
+    newSocket.on('roomUsers', (users: string[]) => {
+      console.log(users);
+    });
+
+    return () => {
+      newSocket.disconnect(); // 컴포넌트가 언마운트될 때 소켓 연결 해제
+    };
+  }, []);
 
   useEffect(() => {
     const handleMessage = (data: MessageData) => {
@@ -21,12 +36,13 @@ export default function HomePage() {
       setChats(prevChats => [...prevChats, ...newChats]);
     };
 
-    socket.on('message', handleMessage);
-
-    return () => {
-      socket.off('message', handleMessage);
-    };
-  }, []);
+    if (socket) {
+      socket.on('message', handleMessage);
+      return () => {
+        socket.off('message', handleMessage);
+      };
+    }
+  }, [socket, opportunity]);
 
   useEffect(() => {
     const { mappedContent, remainingOpportunity } = messageMapper(getMessages(), opportunity);
@@ -41,7 +57,7 @@ export default function HomePage() {
       </Head>
       <Header opportunity={opportunity} />
       <Main>{chats}</Main>
-      <Textplace />
+      <Textplace setChats={setChats} opportunity={opportunity} setOpportunity={setOpportunity} />
     </React.Fragment>
   );
 }
