@@ -3,7 +3,6 @@ import { BrowserWindow, app, ipcMain } from 'electron';
 import serve from 'electron-serve';
 import { createWindow } from './helpers';
 
-
 const windows: BrowserWindow[] = [];
 const isProd = process.env.NODE_ENV === 'production';
 
