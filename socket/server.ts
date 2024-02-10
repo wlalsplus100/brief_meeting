@@ -2,6 +2,7 @@ import express from 'express';
 import { Server } from 'socket.io';
 import http from 'http';
 import cors from 'cors';
+import { UserNames } from './userName';
 
 const expressApp = express();
 const server = http.createServer(expressApp);
@@ -16,9 +17,11 @@ interface TroomUsers {
 }
 
 const roomUsers: TroomUsers = {};
+const userNames = new UserNames();
 
 io.on('connection', socket => {
-  console.log('user connection');
+  const userName = userNames.getRandomName(socket);
+  console.log(`user ${userName} connection`);
 
   socket.on('joinRoom', room => {
     socket.join(room);
@@ -30,7 +33,11 @@ io.on('connection', socket => {
   });
 
   socket.on('sendMessage', data => {
-    io.to(data.room).emit('message', data);
+    socket.to(data.room).emit('message', data);
+  });
+
+  socket.on('disconnecting', () => {
+    userNames.delUsedNames(socket);
   });
 
   socket.on('disconnect', () => {

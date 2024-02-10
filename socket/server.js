@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const socket_io_1 = require("socket.io");
 const http_1 = __importDefault(require("http"));
 const cors_1 = __importDefault(require("cors"));
+const userName_1 = require("./userName");
 const expressApp = (0, express_1.default)();
 const server = http_1.default.createServer(expressApp);
 const io = new socket_io_1.Server(server, {
@@ -15,8 +16,10 @@ const io = new socket_io_1.Server(server, {
     },
 });
 const roomUsers = {};
+const userNames = new userName_1.UserNames();
 io.on('connection', socket => {
-    console.log('user connection');
+    const userName = userNames.getRandomName(socket);
+    console.log(`user ${userName} connection`);
     socket.on('joinRoom', room => {
         socket.join(room);
         if (!roomUsers[room]) {
@@ -26,7 +29,10 @@ io.on('connection', socket => {
         console.log(`user join room: ${room}`);
     });
     socket.on('sendMessage', data => {
-        io.to(data.room).emit('message', data);
+        socket.to(data.room).emit('message', data);
+    });
+    socket.on('disconnecting', () => {
+        userNames.delUsedNames(socket);
     });
     socket.on('disconnect', () => {
         Object.keys(roomUsers).forEach(room => {
