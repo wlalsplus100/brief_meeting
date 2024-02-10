@@ -28,8 +28,10 @@ io.on('connection', socket => {
     if (!roomUsers[room]) {
       roomUsers[room] = [];
     }
-    roomUsers[room].push(socket.id);
+    roomUsers[room].push(userName);
     console.log(`user join room: ${room}`);
+    socket.to(room).emit('joinAnother', userName);
+    socket.emit('roomUsers', roomUsers);
   });
 
   socket.on('sendMessage', data => {
@@ -42,7 +44,7 @@ io.on('connection', socket => {
 
   socket.on('disconnect', () => {
     Object.keys(roomUsers).forEach(room => {
-      roomUsers[room] = roomUsers[room].filter(userId => userId !== socket.id);
+      roomUsers[room] = roomUsers[room].filter(userId => userId !== userName);
     });
     console.log('user Disconnect');
   });
