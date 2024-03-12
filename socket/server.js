@@ -28,7 +28,7 @@ io.on('connection', socket => {
         roomUsers[room].push(userName);
         console.log(`user join room: ${room}`);
         socket.to(room).emit('joinAnother', userName);
-        socket.emit('roomUsers', roomUsers);
+        socket.emit('roomUsers', roomUsers[room]);
     });
     socket.on('sendMessage', data => {
         socket.to(data.room).emit('message', data);
