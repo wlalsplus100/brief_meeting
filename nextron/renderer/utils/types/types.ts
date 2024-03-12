@@ -1,6 +1,6 @@
 export interface Message {
   message: string;
-  sender: string | true;
+  sender: string;
 }
 
 export interface MessageData {

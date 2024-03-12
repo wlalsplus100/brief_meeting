@@ -4,7 +4,9 @@ import React from 'react';
 
 interface Tcontent {
   message: string;
-  sender: string | true;
+  sender: string;
+  lastMessageRef: React.RefObject<HTMLDivElement>;
+  myName: string;
 }
 
 const containerStyle = css`
@@ -38,10 +40,10 @@ const HisChatContainer = styled.div`
   ${containerStyle}
 `;
 
-export const Chat = ({ message, sender }: Tcontent) => {
-  if (typeof sender === 'string') {
+export const Chat = ({ message, sender, lastMessageRef, myName }: Tcontent) => {
+  if (sender !== myName) {
     return (
-      <ChatBox>
+      <ChatBox ref={lastMessageRef}>
         <span>{sender}</span>
         <HisChatContainer>
           <span>{message}</span>
@@ -51,6 +53,7 @@ export const Chat = ({ message, sender }: Tcontent) => {
   }
   return (
     <ChatBox isMyMessage>
+      <span>{sender}</span>
       <MyChatContainer>{message}</MyChatContainer>
     </ChatBox>
   );
