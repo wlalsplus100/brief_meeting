@@ -2,11 +2,11 @@ import React from 'react';
 import styled from '@emotion/styled';
 
 interface TSendButtonProps {
-  onButton: boolean;
+  button: boolean;
   setOnButton: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Button = styled.button<{ onButton: boolean }>`
+const Button = styled.button<{ button: boolean }>`
   all: unset;
   position: absolute;
   right: 4px;
@@ -16,12 +16,19 @@ const Button = styled.button<{ onButton: boolean }>`
   background-color: pink;
   width: 24px;
   height: 24px;
-  display: ${({ onButton }) => (onButton ? 'inline-block' : 'none')};
+  display: ${({ button }) => (button ? 'inline-block' : 'none')};
+  cursor: pointer;
 `;
 
-export const SendButton = ({ onButton, setOnButton }: TSendButtonProps) => {
+export const SendButton = ({ button, setOnButton }: TSendButtonProps) => {
   return (
-    <Button onButton={onButton} role="button">
+    <Button
+      button={button}
+      role="button"
+      onClick={() => {
+        setOnButton(true);
+      }}
+    >
       <img src="/images/Paper_Plane.svg" alt="" width={24} height={24} />
     </Button>
   );

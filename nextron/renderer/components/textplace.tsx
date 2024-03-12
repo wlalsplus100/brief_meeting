@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { keyboardInputDetector } from '../utils/function/keyboardInputDetector';
 import { SendButton } from './sendButton';
 import { sendMessage } from '../utils/function/sendMessage';
@@ -23,37 +23,53 @@ interface TextplaceT {
   setChats: React.Dispatch<React.SetStateAction<React.ReactNode[]>>;
   opportunity: number;
   setOpportunity: React.Dispatch<React.SetStateAction<number>>;
+  lastMessageRef: React.RefObject<HTMLDivElement>;
+  myName: string;
 }
 
-export const Textplace = ({ setChats, opportunity, setOpportunity }: TextplaceT) => {
+export const Textplace = ({
+  setChats,
+  opportunity,
+  setOpportunity,
+  lastMessageRef,
+  myName,
+}: TextplaceT) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [onButton, setOnButton] = useState(false);
+  const [button, setButton] = useState(false);
+  const [sendflag, setSendflag] = useState(false);
+
+  useEffect(() => {
+    if (textareaRef.current && button && sendflag) {
+      const { mappedContent, remainingOpportunity } = messageMapper(
+        [{ message: textareaRef.current.value, sender: myName }],
+        opportunity,
+        lastMessageRef,
+        myName,
+      );
+      setChats(prevChats => [...prevChats, mappedContent]);
+      setOpportunity(remainingOpportunity);
+      sendMessage(textareaRef.current.value);
+      setButton(false);
+      setSendflag(false);
+      textareaRef.current.value = '';
+    }
+  }, [button, sendflag]);
 
   const handleKeyboardEvent: React.KeyboardEventHandler<HTMLDivElement> = event => {
-    if (textareaRef.current?.value !== '') {
-      setOnButton(true);
-      if (keyboardInputDetector(event.nativeEvent) === 'Enter' && textareaRef.current) {
-        // 메세지를 보내는 함수 호출
-
-        const { mappedContent, remainingOpportunity } = messageMapper(
-          [{ message: textareaRef.current.value, sender: true }],
-          opportunity,
-        );
-        setChats(prevChats => [...prevChats, mappedContent]);
-        setOpportunity(remainingOpportunity);
-        sendMessage(textareaRef.current.value);
-        setOnButton(false);
-        textareaRef.current.value = '';
+    if (textareaRef.current?.value.trim() !== '') {
+      setButton(true);
+      if (keyboardInputDetector(event.nativeEvent) === 'Enter' && !event.shiftKey) {
+        setSendflag(true);
       }
     } else {
-      setOnButton(false);
+      setButton(false);
     }
   };
 
   return (
     <Container onKeyUp={handleKeyboardEvent}>
       <Textarea ref={textareaRef}></Textarea>
-      <SendButton onButton={onButton} setOnButton={setOnButton} />
+      <SendButton button={button} setOnButton={setSendflag} />
     </Container>
   );
 };
