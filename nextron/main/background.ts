@@ -1,9 +1,7 @@
 import path from 'path';
 import { BrowserWindow, app, ipcMain } from 'electron';
 import serve from 'electron-serve';
-import { createWindow } from './helpers';
 
-const windows: BrowserWindow[] = [];
 const isProd = process.env.NODE_ENV === 'production';
 
 if (isProd) {
@@ -12,28 +10,56 @@ if (isProd) {
   app.setPath('userData', `${app.getPath('userData')} (development)`);
 }
 
-async function createNewWindow() {
-  const newWindow = createWindow('main', {
+async function createMainWindow(port: string, preloadPath: string) {
+  const mainWindow = new BrowserWindow({
     width: 1000,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: preloadPath,
     },
   });
 
-  windows.push(newWindow);
   if (isProd) {
-    await newWindow.loadURL('app://./home');
+    await mainWindow.loadURL('app://./home');
   } else {
-    const port = process.argv[2];
-    await newWindow.loadURL(`http://localhost:${port}/home`);
-    newWindow.webContents.openDevTools();
+    await mainWindow.loadURL(`http://localhost:${port}/home`);
+    mainWindow.webContents.openDevTools();
   }
 
-  return newWindow;
+  return mainWindow;
 }
 
-app.whenReady().then(createNewWindow);
+async function createSecondWindow(port: string, preloadPath: string) {
+  const secondWindow = new BrowserWindow({
+    width: 1000,
+    height: 600,
+    webPreferences: {
+      preload: preloadPath,
+    },
+  });
+
+  if (isProd) {
+    await secondWindow.loadURL('app://./home');
+  } else {
+    await secondWindow.loadURL(`http://localhost:${port}/home`);
+    secondWindow.webContents.openDevTools();
+  }
+
+  return secondWindow;
+}
+
+app.whenReady().then(() => {
+  const preloadPath = path.join(__dirname, 'preload.js');
+  const port = process.argv[2] || '3000'; // Default port 3000
+  console.log(process.argv);
+
+  createMainWindow(port, preloadPath);
+
+  // Check command-line arguments to determine whether to open a second window
+  if (process.argv.includes('--second-window')) {
+    createSecondWindow(port, preloadPath);
+  }
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -42,11 +68,10 @@ app.on('window-all-closed', () => {
 });
 
 app.on('before-quit', () => {
-  windows.forEach(window => {
-    window.close();
-  });
+  // Add any cleanup tasks here if needed
 });
 
 ipcMain.on('message', async (event, arg) => {
+  // Echo the message back to the sender
   event.reply('message', `${arg} World!`);
 });
