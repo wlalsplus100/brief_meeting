@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "nextron",
     "dev:client1": "nextron --renderer-port 7777",
-    "dev:client2": "nextron --renderer-port 7778",
+    "dev:client2": "nextron --renderer-port 7778 -- --second-window",
     "build": "nextron build",
     "postinstall": "electron-builder install-app-deps",
     "test": "jest",
@@ -63,5 +63,6 @@
     "typescript": "^5.2.2"
   },
   "repository": "https://github.com/wlalsplus100/brief_meeting.git",
-  "license": "MIT"
+  "license": "MIT",
+  "packageManager": "yarn@1.22.19"
 }
