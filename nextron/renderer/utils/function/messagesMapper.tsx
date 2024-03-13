@@ -15,7 +15,7 @@ export const messageMapper = (
         sender={item.sender}
         lastMessageRef={lastMessageRef}
         myName={myName}
-        key={index}
+        key={opportunity}
       />
     );
   });
