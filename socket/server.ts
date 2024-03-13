@@ -3,6 +3,7 @@ import { Server } from 'socket.io';
 import http from 'http';
 import cors from 'cors';
 import { UserNames } from './userName';
+import { roomConnect, roomCreate } from './roomFunction';
 
 const expressApp = express();
 const server = http.createServer(expressApp);
@@ -12,26 +13,22 @@ const io = new Server(server, {
   },
 });
 
-interface TroomUsers {
-  [room: string]: string[];
-}
-
-const roomUsers: TroomUsers = {};
+const roomUsers: Array<string[]> = [];
 const userNames = new UserNames();
 
 io.on('connection', socket => {
   const userName = userNames.getRandomName(socket);
+  let index = 0;
   console.log(`user ${userName} connection`);
 
-  socket.on('joinRoom', room => {
-    socket.join(room);
-    if (!roomUsers[room]) {
-      roomUsers[room] = [];
-    }
-    roomUsers[room].push(userName);
-    console.log(`user join room: ${room}`);
-    socket.to(room).emit('joinAnother', userName);
-    socket.emit('roomUsers', roomUsers[room]);
+  socket.on('joinRoom', () => {
+    roomCreate(roomUsers);
+    index = roomConnect(socket, roomUsers);
+    console.log(index);
+    roomUsers[index].push(userName);
+    console.log(`user join room${index}: ${roomUsers[index]}`);
+    socket.to(`room${index}`).emit('joinAnother', userName);
+    socket.emit('roomUsers', { roomMember: roomUsers[index], roomName: `room${index}` });
   });
 
   socket.on('sendMessage', data => {
@@ -43,9 +40,12 @@ io.on('connection', socket => {
   });
 
   socket.on('disconnect', () => {
-    Object.keys(roomUsers).forEach(room => {
-      roomUsers[room] = roomUsers[room].filter(userId => userId !== userName);
-    });
+    const userIndex = roomUsers[index].indexOf(userName);
+    if (userIndex !== -1) {
+      roomUsers[index].splice(userIndex, 1);
+    } else {
+      console.log('잉 못찾음');
+    }
     console.log('user Disconnect');
   });
 });

@@ -8,6 +8,11 @@ import { connectSocket } from '../utils/function/socketConnect';
 import { MessageData } from '../utils/types/types';
 import { Socket } from 'socket.io-client';
 
+interface TroomUsers {
+  roomMember: string[];
+  roomName: string;
+}
+
 export default function HomePage() {
   const [opportunity, setOpportunity] = useState<number>(30);
   const [chats, setChats] = useState<React.ReactNode[]>([]);
@@ -15,13 +20,16 @@ export default function HomePage() {
   const opponentNameRef = useRef<string>('');
   const [myName, setMyName] = useState<string>('');
   const lastMessageRef = useRef<HTMLDivElement>(null);
+  const [roomName, setRoomName] = useState<string>('');
 
   useEffect(() => {
     const newSocket = connectSocket();
     setSocket(newSocket);
     newSocket.emit('joinRoom', 'room1');
-    newSocket.on('roomUsers', (users: string[]) => {
+    newSocket.on('roomUsers', ({ roomMember: users, roomName }: TroomUsers) => {
+      setRoomName(roomName);
       console.log(users);
+      console.log(roomName);
       if (users.length == 2) {
         opponentNameRef.current = users[0];
         setMyName(users[1]);
@@ -47,7 +55,6 @@ export default function HomePage() {
         lastMessageRef,
         myName,
       ).mappedContent;
-      lastMessageRef.current;
       setChats(prevChats => [...prevChats, ...newChats]);
       setOpportunity(opportunity - 1);
     };
@@ -73,6 +80,7 @@ export default function HomePage() {
         setOpportunity={setOpportunity}
         lastMessageRef={lastMessageRef}
         myName={myName}
+        roomName={roomName}
       />
     </React.Fragment>
   );

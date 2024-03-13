@@ -1,6 +1,6 @@
 import { connectSocket } from './socketConnect';
 
-export const sendMessage = async (msg: string) => {
+export const sendMessage = async (msg: string, roomName: string) => {
   const socket = connectSocket();
-  socket.emit('sendMessage', { message: msg, room: 'room1' });
+  socket.emit('sendMessage', { message: msg, room: roomName });
 };

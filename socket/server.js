@@ -8,6 +8,7 @@ const socket_io_1 = require("socket.io");
 const http_1 = __importDefault(require("http"));
 const cors_1 = __importDefault(require("cors"));
 const userName_1 = require("./userName");
+const roomFunction_1 = require("./roomFunction");
 const expressApp = (0, express_1.default)();
 const server = http_1.default.createServer(expressApp);
 const io = new socket_io_1.Server(server, {
@@ -15,20 +16,20 @@ const io = new socket_io_1.Server(server, {
         origin: true,
     },
 });
-const roomUsers = {};
+const roomUsers = [];
 const userNames = new userName_1.UserNames();
 io.on('connection', socket => {
     const userName = userNames.getRandomName(socket);
+    let index = 0;
     console.log(`user ${userName} connection`);
-    socket.on('joinRoom', room => {
-        socket.join(room);
-        if (!roomUsers[room]) {
-            roomUsers[room] = [];
-        }
-        roomUsers[room].push(userName);
-        console.log(`user join room: ${room}`);
-        socket.to(room).emit('joinAnother', userName);
-        socket.emit('roomUsers', roomUsers[room]);
+    socket.on('joinRoom', () => {
+        (0, roomFunction_1.roomCreate)(roomUsers);
+        index = (0, roomFunction_1.roomConnect)(socket, roomUsers);
+        console.log(index);
+        roomUsers[index].push(userName);
+        console.log(`user join room${index}: ${roomUsers[index]}`);
+        socket.to(`room${index}`).emit('joinAnother', userName);
+        socket.emit('roomUsers', { roomMember: roomUsers[index], roomName: `room${index}` });
     });
     socket.on('sendMessage', data => {
         socket.to(data.room).emit('message', data);
@@ -37,9 +38,13 @@ io.on('connection', socket => {
         userNames.delUsedNames(socket);
     });
     socket.on('disconnect', () => {
-        Object.keys(roomUsers).forEach(room => {
-            roomUsers[room] = roomUsers[room].filter(userId => userId !== userName);
-        });
+        const userIndex = roomUsers[index].indexOf(userName);
+        if (userIndex !== -1) {
+            roomUsers[index].splice(userIndex, 1);
+        }
+        else {
+            console.log('잉 못찾음');
+        }
         console.log('user Disconnect');
     });
 });

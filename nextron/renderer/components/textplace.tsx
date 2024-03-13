@@ -25,6 +25,7 @@ interface TextplaceT {
   setOpportunity: React.Dispatch<React.SetStateAction<number>>;
   lastMessageRef: React.RefObject<HTMLDivElement>;
   myName: string;
+  roomName: string;
 }
 
 export const Textplace = ({
@@ -33,6 +34,7 @@ export const Textplace = ({
   setOpportunity,
   lastMessageRef,
   myName,
+  roomName,
 }: TextplaceT) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [button, setButton] = useState(false);
@@ -48,7 +50,7 @@ export const Textplace = ({
       );
       setChats(prevChats => [...prevChats, mappedContent]);
       setOpportunity(remainingOpportunity);
-      sendMessage(textareaRef.current.value);
+      sendMessage(textareaRef.current.value, roomName);
       setButton(false);
       setSendflag(false);
       textareaRef.current.value = '';
