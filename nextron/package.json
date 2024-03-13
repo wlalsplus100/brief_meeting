@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "nextron",
     "dev:client1": "nextron --renderer-port 7777",
-    "dev:client2": "nextron --renderer-port 7778 -- --second-window",
+    "dev:client2": "nextron --renderer-port 7778 --electron-options=\"--second-window\"",
     "build": "nextron build",
     "postinstall": "electron-builder install-app-deps",
     "test": "jest",

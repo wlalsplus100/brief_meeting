@@ -51,12 +51,11 @@ async function createSecondWindow(port: string, preloadPath: string) {
 app.whenReady().then(() => {
   const preloadPath = path.join(__dirname, 'preload.js');
   const port = process.argv[2] || '3000'; // Default port 3000
-  console.log(process.argv);
 
   createMainWindow(port, preloadPath);
 
   // Check command-line arguments to determine whether to open a second window
-  if (process.argv.includes('--second-window')) {
+  if (process.argv[3].includes('--second-window')) {
     createSecondWindow(port, preloadPath);
   }
 });
